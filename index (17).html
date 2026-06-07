@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>My Diary Journal</title>
+<meta name="theme-color" content="#e07a3f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Diary Journal">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" href="./icon.png">
+<link rel="apple-touch-icon" href="./icon.png">
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#fbf7ef;font-family:system-ui,sans-serif;color:#6b4a3a}
+  #app{position:fixed;inset:0;width:100%;height:100%;border:0}
+  /* setup / loading screens */
+  .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:28px;gap:14px}
+  .screen img{width:120px;height:120px;border-radius:24px;box-shadow:0 10px 30px rgba(107,74,58,.25)}
+  .screen h1{font-size:1.3rem;margin:6px 0 0}
+  .screen p{max-width:420px;color:#8a6b56;line-height:1.55;margin:0}
+  .screen code{background:#fff;border:1px solid #e7dcc8;border-radius:8px;padding:2px 6px;font-size:.85rem}
+  .spinner{width:38px;height:38px;border:4px solid #e7dcc8;border-top-color:#e07a3f;border-radius:50%;
+    animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* branded splash / loading animation */
+  #loading{gap:22px;transition:opacity .5s ease}
+  #loading.fade{opacity:0}
+  .splash-logo{width:128px;height:128px;border-radius:30px;box-shadow:0 14px 40px rgba(107,74,58,.28);
+    animation:pop .6s cubic-bezier(.2,.9,.3,1.4) both, breathe 2.4s ease-in-out .6s infinite}
+  @keyframes pop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .splash-title{font-family:system-ui,sans-serif;font-weight:800;font-size:1.45rem;color:#e07a3f;
+    letter-spacing:.2px;animation:rise .6s ease .15s both}
+  .splash-sub{color:#8a6b56;font-size:.92rem;margin-top:-12px;animation:rise .6s ease .3s both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .bar{width:170px;height:7px;border-radius:7px;background:#eaddc8;overflow:hidden}
+  .bar i{display:block;height:100%;width:40%;border-radius:7px;background:linear-gradient(90deg,#e07a3f,#7fae5f);
+    animation:slide 1.2s ease-in-out infinite}
+  @keyframes slide{0%{transform:translateX(-110%)}100%{transform:translateX(320%)}}
+  .hidden{display:none!important}
+  a.btn{margin-top:8px;background:#e07a3f;color:#fff;text-decoration:none;font-weight:700;
+    padding:11px 22px;border-radius:30px;box-shadow:0 6px 0 #b85b27}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PASTE YOUR WEB APP URL BELOW (between the quotes).
+     Use your Google Apps Script deployment URL, the one ending
+     in /exec   e.g.
+     https://script.google.com/macros/s/AKfycb..../exec
+     Save the file, re-upload, done. The app always shows live.
+     ============================================================ -->
+<script>
+  var APP_URL = "";
+</script>
+
+<!-- live app -->
+<iframe id="app" class="hidden" title="My Diary Journal"
+        allow="clipboard-write; fullscreen; camera; microphone"
+        referrerpolicy="no-referrer"></iframe>
+
+<!-- shown while the app loads -->
+<div id="loading" class="screen hidden">
+  <img class="splash-logo" src="./icon.png" alt="">
+  <div class="splash-title">My Diary Journal</div>
+  <div class="splash-sub">Opening your journal…</div>
+  <div class="bar"><i></i></div>
+</div>
+
+<!-- shown if no URL has been pasted yet -->
+<div id="setup" class="screen">
+  <img src="./icon.png" alt="">
+  <h1>Almost ready!</h1>
+  <p>Open <code>index.html</code> and paste your web app URL into the
+     <code>APP_URL</code> line near the top (the link ending in <code>/exec</code>),
+     then re-upload. This shell will then load your live app automatically.</p>
+</div>
+
+<script>
+  (function(){
+    var url = (APP_URL || "").trim();
+    var frame = document.getElementById('app');
+    var setup = document.getElementById('setup');
+    var loading = document.getElementById('loading');
+
+    if(!url){ setup.classList.remove('hidden'); return; }
+
+    setup.classList.add('hidden');
+    loading.classList.remove('hidden');
+
+    function reveal(){
+      if(reveal.done) return; reveal.done = true;
+      frame.classList.remove('hidden');
+      loading.classList.add('fade');
+      setTimeout(function(){ loading.classList.add('hidden'); }, 500);
+    }
+    frame.addEventListener('load', function(){
+      // small minimum so the splash animation is seen, not a flash
+      setTimeout(reveal, 600);
+    });
+    // fallback: reveal even if 'load' is slow/blocked
+    setTimeout(reveal, 5000);
+
+    frame.src = url;
+  })();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
+</script>
+</body>
+</html>
