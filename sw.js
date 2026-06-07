@@ -1,8 +1,6 @@
-// My Diary Journal - Service Worker (shell only)
-// Caches the PWA shell so it installs/launches; the live web app itself
-// is always fetched from the network so your edits show immediately.
-const CACHE_NAME = 'diary-journal-shell-v1';
-const ASSETS = ['./', './index.html', './manifest.json', './icon.png'];
+// My Diary Journal - Service Worker
+const CACHE_NAME = 'diary-journal-v1';
+const ASSETS = ['./'];
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
@@ -26,14 +24,9 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-  var url = event.request.url;
-  // Only serve the shell from cache. Everything else (the live Apps Script
-  // app and its requests) goes straight to the network.
-  if (url.indexOf(self.registration.scope) === 0) {
-    event.respondWith(
-      caches.match(event.request).then(function(response) {
-        return response || fetch(event.request);
-      })
-    );
-  }
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      return response || fetch(event.request);
+    })
+  );
 });
